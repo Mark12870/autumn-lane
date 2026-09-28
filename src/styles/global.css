@@ -149,23 +149,28 @@ h2 {
   min-height: 52px;
   padding: 14px 34px;
   border-radius: 999px;
-  background: #01609c;
-  color: #fff;
-  font-size: 16px;
-  line-height: 1.2;
-  transition: background 0.2s;
-}
-.button:hover {
-  background: #014a78;
-  color: #fff;
-}
-.button-light {
   background: #fff;
   color: #111;
+  font-size: 16px;
+  line-height: 1.2;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.2s;
 }
-.button-light:hover {
+.button:hover {
   background: #e6e4df;
   color: #111;
+}
+.button-outline {
+  background: transparent;
+  color: #fff;
+  box-shadow: inset 0 0 0 2px #ffffffb3;
+}
+.button-outline:hover {
+  background: #fff;
+  color: #111;
+  box-shadow: inset 0 0 0 2px #fff;
 }
 .button svg {
   width: 20px;
@@ -218,12 +223,15 @@ figure {
   transform: translate(-50%, -50%);
   border: 1px solid #fff8;
   background: #111c;
+  color: #fff;
   border-radius: 50%;
   width: 70px;
   height: 70px;
   display: grid;
   place-items: center;
-  transition: background 0.2s;
+  transition:
+    background 0.2s,
+    color 0.2s;
 }
 .play svg {
   width: 28px;
@@ -231,7 +239,8 @@ figure {
 }
 .video-launch:hover .play,
 .video-launch:focus-visible .play {
-  background: #01609c;
+  background: #fff;
+  color: #111;
 }
 .videos,
 .instagram {
@@ -244,12 +253,25 @@ figure {
   border-radius: 12px;
   display: block;
 }
+.listen {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 30px;
+}
 .platforms {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  justify-content: center;
-  margin-top: 30px;
+  display: grid;
+  align-content: space-between;
+  gap: 12px;
+}
+@media (max-width: 900px) {
+  .listen {
+    grid-template-columns: 1fr;
+  }
+  .platforms {
+    width: 100%;
+    max-width: 240px;
+    margin-inline: auto;
+  }
 }
 .instagram .container {
   text-align: center;
@@ -310,10 +332,11 @@ footer {
 }
 .footer-socials a {
   color: #fff;
-  transition: color 0.2s;
+  transition: opacity 0.2s;
 }
 .footer-socials a:hover {
-  color: #01609c;
+  color: #fff;
+  opacity: 0.7;
 }
 .footer-socials svg {
   display: block;
@@ -333,8 +356,8 @@ footer p {
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background: #01609c;
-  color: #fff;
+  background: #fff;
+  color: #111;
   box-shadow: 0 6px 20px #0006;
   opacity: 0;
   visibility: hidden;
@@ -348,8 +371,8 @@ footer p {
   visibility: visible;
 }
 .to-top:hover {
-  color: #fff;
-  background: #014a78;
+  color: #111;
+  background: #e6e4df;
 }
 .to-top svg {
   width: 22px;
@@ -388,13 +411,6 @@ footer p {
   }
   h1 {
     margin: 15px 0 24px;
-  }
-  .platforms {
-    display: grid;
-    justify-content: stretch;
-    gap: 12px;
-    max-width: 320px;
-    margin-inline: auto;
   }
   footer {
     padding-bottom: 90px;
