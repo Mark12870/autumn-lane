@@ -159,6 +159,14 @@ h2 {
   background: #014a78;
   color: #fff;
 }
+.button-light {
+  background: #fff;
+  color: #111;
+}
+.button-light:hover {
+  background: #e6e4df;
+  color: #111;
+}
 .button svg {
   width: 20px;
   height: 20px;
@@ -195,6 +203,14 @@ figure {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition:
+    transform 0.4s,
+    filter 0.4s;
+}
+.video-launch:hover img,
+.video-launch:focus-visible img {
+  transform: scale(1.03);
+  filter: brightness(1.1);
 }
 .play {
   position: absolute;
@@ -207,14 +223,15 @@ figure {
   height: 70px;
   display: grid;
   place-items: center;
+  transition: background 0.2s;
 }
 .play svg {
   width: 28px;
   height: 28px;
-  margin-left: 3px;
 }
-.video-launch:hover .play {
-  background: #111;
+.video-launch:hover .play,
+.video-launch:focus-visible .play {
+  background: #01609c;
 }
 .videos,
 .instagram {
@@ -251,15 +268,20 @@ figure {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition:
+    transform 0.4s,
+    filter 0.4s;
 }
-.instagram-grid a:hover img {
-  opacity: 0.85;
+.instagram-grid a:hover img,
+.instagram-grid a:focus-visible img {
+  transform: scale(1.05);
+  filter: brightness(1.12);
 }
 .post-video {
   position: absolute;
   inset: 50% auto auto 50%;
-  width: 48px;
-  height: 48px;
+  width: clamp(32px, 18%, 48px);
+  height: auto;
   transform: translate(-50%, -50%);
   color: #fff;
   filter: drop-shadow(0 0 6px #0006);
@@ -277,28 +299,49 @@ figure {
   margin-top: 30px;
 }
 footer {
-  padding: 30px var(--gutter);
+  padding: 40px var(--gutter) 30px;
   text-align: center;
+}
+.footer-socials {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+.footer-socials a {
+  color: #fff;
+  transition: color 0.2s;
+}
+.footer-socials a:hover {
+  color: #01609c;
+}
+.footer-socials svg {
+  display: block;
+  width: 32px;
+  height: 32px;
 }
 footer p {
   margin: 0;
 }
 .to-top {
   position: fixed;
-  right: 30px;
-  bottom: 30px;
+  right: 24px;
+  bottom: 24px;
   z-index: 5;
-  width: 30px;
-  height: 30px;
+  width: 52px;
+  height: 52px;
   display: grid;
   place-items: center;
+  border-radius: 50%;
   background: #01609c;
   color: #fff;
+  box-shadow: 0 6px 20px #0006;
   opacity: 0;
   visibility: hidden;
   transition:
     opacity 0.2s,
-    visibility 0.2s;
+    visibility 0.2s,
+    background 0.2s;
 }
 .to-top.visible {
   opacity: 1;
@@ -306,20 +349,15 @@ footer p {
 }
 .to-top:hover {
   color: #fff;
-  background: #00234b;
+  background: #014a78;
 }
 .to-top svg {
-  width: 18px;
-  height: 18px;
+  width: 22px;
+  height: 22px;
 }
 @media (max-width: 800px) {
   .instagram-grid {
     grid-template-columns: repeat(2, 1fr);
-  }
-}
-@media (max-width: 480px) {
-  .instagram-grid {
-    grid-template-columns: 1fr;
   }
 }
 @media (max-width: 700px) {
@@ -359,7 +397,7 @@ footer p {
     margin-inline: auto;
   }
   footer {
-    padding-bottom: 70px;
+    padding-bottom: 90px;
   }
   .to-top {
     right: 16px;
@@ -371,5 +409,9 @@ footer p {
   *::before,
   *::after {
     transition: none !important;
+  }
+  .video-launch:hover img,
+  .instagram-grid a:hover img {
+    transform: none;
   }
 }

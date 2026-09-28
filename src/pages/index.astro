@@ -28,7 +28,7 @@ const socialIcons: Record<string, string> = {
 ---
 
 <!doctype html>
-<html lang="cs">
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -40,7 +40,7 @@ const socialIcons: Record<string, string> = {
     <link rel="apple-touch-icon" href={asset('apple-touch-icon.png')} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:locale" content="cs_CZ" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:title" content={site.name} />
     <meta property="og:description" content={site.description} />
     <meta property="og:url" content={canonical} />
@@ -54,7 +54,7 @@ const socialIcons: Record<string, string> = {
   </head>
   <body id="top">
     <a class="skip-link" href="#main">
-      Přeskočit na obsah
+      Skip to content
     </a>
     <header class="header">
       <a class="brand" href="#top" aria-label="Autumn Lane home">
@@ -89,7 +89,7 @@ const socialIcons: Record<string, string> = {
           <div class="release-copy">
             <p class="eyebrow">RELEASED EP</p>
             <h1 id="release-title">{site.release.title}</h1>
-            <a class="button" href={site.release.url}>
+            <a class="button button-light" href={site.release.url}>
               {site.release.buttonLabel}
             </a>
           </div>
@@ -127,10 +127,10 @@ const socialIcons: Record<string, string> = {
                     aria-label={`Play ${video.title}`}
                   >
                     <img
-                      src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
+                      src={`https://i.ytimg.com/vi/${video.youtubeId}/maxresdefault.jpg`}
                       alt=""
-                      width="480"
-                      height="360"
+                      width="1280"
+                      height="720"
                       loading="lazy"
                     />
                     <span class="play" aria-hidden="true">
@@ -164,8 +164,9 @@ const socialIcons: Record<string, string> = {
           </div>
         </div>
       </section>
-      <section class="section instagram" aria-label="Instagram">
+      <section class="section instagram" aria-labelledby="instagram-title">
         <div class="container">
+          <h2 id="instagram-title">Instagram</h2>
           <div class="instagram-grid">
             {feed.posts.map((post) => (
               <a
@@ -197,11 +198,18 @@ const socialIcons: Record<string, string> = {
       </section>
     </main>
     <footer>
+      <nav class="footer-socials" aria-label="Autumn Lane elsewhere">
+        {site.socials.map((social) => (
+          <a href={social.url} aria-label={social.label}>
+            <Icon svg={socialIcons[social.label]} />
+          </a>
+        ))}
+      </nav>
       <p>
         Copyright © {new Date().getFullYear()} {site.name}
       </p>
     </footer>
-    <a class="to-top" href="#top" aria-label="Přejít nahoru">
+    <a class="to-top" href="#top" aria-label="Back to top">
       <Icon svg={caretUpIcon} />
     </a>
     <script>
