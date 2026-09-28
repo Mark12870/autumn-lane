@@ -177,7 +177,19 @@ h2 {
   height: 20px;
 }
 .section {
+  position: relative;
+  isolation: isolate;
   padding: clamp(55px, 8vw, 100px) var(--gutter);
+}
+/* Film grain over the flat sections so they match the textured hero. */
+.section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='2.4' intercept='-.7'/%3E%3CfeFuncG type='linear' slope='2.4' intercept='-.7'/%3E%3CfeFuncB type='linear' slope='2.4' intercept='-.7'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.1;
 }
 .container {
   max-width: var(--content-width);
@@ -242,12 +254,23 @@ figure {
   background: #fff;
   color: #111;
 }
-.videos,
+/* Darkened concert photos under the slate color, like the hero photo. */
+.videos {
+  background:
+    linear-gradient(#161d26e0, #161d26eb),
+    url('../assets/backdrops/videos.jpg') center / cover fixed,
+    #161d26;
+}
 .instagram {
-  background: #161d26;
+  background:
+    linear-gradient(#161d26e0, #161d26eb),
+    url('../assets/backdrops/instagram.jpg') center / cover fixed,
+    #161d26;
 }
 .streaming {
-  background: #000;
+  background:
+    radial-gradient(ellipse 60% 70% at 50% -10%, #b2222226, transparent 70%),
+    #000;
 }
 .spotify {
   border-radius: 12px;
