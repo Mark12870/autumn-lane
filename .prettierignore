@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.idea/
+.instagram-stage/
+package-lock.json
+public/images/
+public/fonts/
+src/assets/
+.env*
+.husky/_/

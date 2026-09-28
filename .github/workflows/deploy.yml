@@ -1,0 +1,85 @@
+name: Deploy website
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      sync_instagram:
+        description: Fetch Instagram before building (requires configured secrets)
+        type: boolean
+        default: false
+  schedule:
+    - cron: '23 7 * * *'
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pages: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run format:check
+      - run: npm test
+      - name: Update Instagram cache
+        if: github.event_name == 'schedule' || inputs.sync_instagram == true
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCOUNT_ID: ${{ vars.INSTAGRAM_ACCOUNT_ID }}
+          INSTAGRAM_API_KIND: ${{ vars.INSTAGRAM_API_KIND }}
+          INSTAGRAM_API_VERSION: ${{ vars.INSTAGRAM_API_VERSION }}
+          INSTAGRAM_SECRETS_TOKEN: ${{ secrets.INSTAGRAM_SECRETS_TOKEN }}
+        run: |
+          if [ "$(date -u +%u)" = "1" ]; then
+            export REFRESH_INSTAGRAM_TOKEN=true
+          fi
+          npm run sync:instagram
+      - name: Save successful feed snapshot
+        if: github.event_name == 'schedule' || inputs.sync_instagram == true
+        run: |
+          npx prettier --write src/content/instagram.json
+          git add src/content/instagram.json public/images/instagram
+          if ! git diff --cached --quiet; then
+            git -c user.name='github-actions[bot]' -c user.email='41898282+github-actions[bot]@users.noreply.github.com' commit -m "Update Instagram feed"
+            git push origin HEAD:main
+          fi
+      - name: Read Pages configuration
+        id: pages
+        uses: actions/configure-pages@v5
+      - name: Build
+        run: npm run build && npm run check:build
+        env:
+          SITE_URL: ${{ steps.pages.outputs.origin }}
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

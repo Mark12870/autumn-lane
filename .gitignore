@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.astro/
+.env
+.env.*
+!.env.example
+.idea/
+.DS_Store
+.instagram-stage/
+
+opencode.json

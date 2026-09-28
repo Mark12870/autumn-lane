@@ -1,0 +1,208 @@
+---
+import { Image } from 'astro:assets';
+import band from '../assets/band.jpg';
+import cover from '../assets/eaten-by-mind.png';
+import site from '../content/site.json';
+import feed from '../content/instagram.json';
+import '../styles/global.css';
+
+const asset = (path: string) =>
+  `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
+const canonical = new URL(import.meta.env.BASE_URL, Astro.site);
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={site.description} />
+    <meta name="theme-color" content="#101010" />
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={site.name} />
+    <meta property="og:description" content={site.description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(cover.src, canonical).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <title>{site.name} — Alternative rock from Brno</title>
+    <style
+      is:inline
+      set:html={`@font-face{font-family:'World of Water';src:url('${asset('fonts/world-of-water.otf')}') format('opentype');font-display:swap;font-weight:400;}`}
+    />
+  </head>
+  <body id="top">
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    <header class="header">
+      <a class="brand" href="#top" aria-label="Autumn Lane home">
+        <img
+          src={asset('images/logo.png')}
+          alt="Autumn Lane"
+          width="800"
+          height="100"
+        />
+      </a>
+      <nav class="socials" aria-label="Find Autumn Lane">
+        {site.socials.map((social) => (
+          <a href={social.url}>{social.label}</a>
+        ))}
+      </nav>
+    </header>
+    <main id="main">
+      <section class="hero" aria-labelledby="release-title">
+        <Image
+          class="hero-photo"
+          src={band}
+          alt=""
+          widths={[640, 1024, 1536, 2048]}
+          sizes="100vw"
+          loading="eager"
+          fetchpriority="high"
+          format="webp"
+        />
+        <div class="hero-inner">
+          <div class="release-copy">
+            <p class="eyebrow">Autumn Lane</p>
+            <h1 id="release-title">{site.release.title}</h1>
+            <a class="button" href={site.release.url}>
+              {site.release.buttonLabel}
+              <span aria-hidden="true"> ↗</span>
+            </a>
+          </div>
+          <a
+            class="cover"
+            href={site.release.url}
+            aria-label={`Listen to ${site.release.title}`}
+          >
+            <Image
+              src={cover}
+              alt={`${site.release.title} cover artwork`}
+              widths={[400, 600, 1000]}
+              sizes="(max-width: 700px) 85vw, 500px"
+              loading="eager"
+              format="webp"
+            />
+          </a>
+        </div>
+      </section>
+      <section class="section videos" aria-labelledby="videos-title">
+        <div class="container">
+          <h2 id="videos-title">Videos</h2>
+          <div class="video-list">
+            {site.videos.map((video) => (
+              <figure>
+                <div
+                  class="video"
+                  data-video-id={video.youtubeId}
+                  data-title={`${site.name} — ${video.title}`}
+                >
+                  <a
+                    class="video-launch"
+                    href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
+                    aria-label={`Play ${video.title}`}
+                  >
+                    <img
+                      src={`https://i.ytimg.com/vi/${video.youtubeId}/hqdefault.jpg`}
+                      alt=""
+                      width="480"
+                      height="360"
+                      loading="lazy"
+                    />
+                    <span class="play" aria-hidden="true">
+                      ▶
+                    </span>
+                  </a>
+                </div>
+                <figcaption>{video.title}</figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section class="section streaming" aria-labelledby="streaming-title">
+        <div class="container">
+          <h2 id="streaming-title">Streaming Platforms</h2>
+          <iframe
+            class="spotify"
+            title="Listen to Autumn Lane on Spotify"
+            src={`https://open.spotify.com/embed/artist/${site.spotifyArtistId}`}
+            width="100%"
+            height="352"
+            loading="lazy"
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          />
+          <div class="platforms">
+            {site.streaming.map((platform) => (
+              <a class="button" href={platform.url}>
+                {platform.label}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+      <section class="section instagram" aria-labelledby="instagram-title">
+        <div class="container wide">
+          <h2 id="instagram-title">Instagram</h2>
+          <div class="instagram-grid">
+            {feed.posts.map((post) => (
+              <a
+                href={post.permalink}
+                aria-label={post.caption || 'View post on Instagram'}
+              >
+                <img
+                  src={asset(post.image)}
+                  alt={post.caption || 'Autumn Lane on Instagram'}
+                  width="640"
+                  height="640"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span class="post-overlay" aria-hidden="true">
+                  View on Instagram ↗
+                </span>
+              </a>
+            ))}
+          </div>
+          <a class="button follow" href={site.instagramUrl}>
+            Follow @autumnlaneband ↗
+          </a>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <p>
+        Copyright © {new Date().getFullYear()} {site.name}
+      </p>
+      <a href="#top">Back to top ↑</a>
+    </footer>
+    <script>
+      document
+        .querySelectorAll<HTMLAnchorElement>('.video-launch')
+        .forEach((link) => {
+          link.addEventListener('click', (event) => {
+            if (
+              event.ctrlKey ||
+              event.metaKey ||
+              event.shiftKey ||
+              event.altKey
+            )
+              return;
+            const container = link.closest<HTMLElement>('[data-video-id]');
+            if (!container) return;
+            event.preventDefault();
+            const player = document.createElement('iframe');
+            player.src = `https://www.youtube-nocookie.com/embed/${container.dataset.videoId}?autoplay=1`;
+            player.title = container.dataset.title || 'Autumn Lane video';
+            player.allow =
+              'autoplay; encrypted-media; fullscreen; picture-in-picture';
+            player.allowFullscreen = true;
+            container.replaceChildren(player);
+            player.focus();
+          });
+        });
+    </script>
+  </body>
+</html>
