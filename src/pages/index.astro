@@ -19,7 +19,9 @@ const canonical = new URL(asset('/'), Astro.site);
     <meta name="description" content={site.description} />
     <meta name="theme-color" content="#101010" />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" href={asset('favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={asset('favicon-32.png')} sizes="32x32" />
+    <link rel="icon" href={asset('favicon-192.png')} sizes="192x192" />
+    <link rel="apple-touch-icon" href={asset('apple-touch-icon.png')} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={site.name} />
     <meta property="og:description" content={site.description} />
