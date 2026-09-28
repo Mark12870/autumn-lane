@@ -10,7 +10,9 @@ import {
 } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import sharp from 'sharp';
 import {
+  isDark,
   normalizePosts,
   syncInstagram,
   trustedUrl,
@@ -151,6 +153,90 @@ test('a successful empty feed removes posts that are no longer available', async
   assert.deepEqual(feed.posts, []);
   await assert.rejects(
     access(join(options.root, 'public/images/instagram/old.jpg')),
+  );
+});
+
+const solid = (value) =>
+  sharp({
+    create: {
+      width: 8,
+      height: 8,
+      channels: 3,
+      background: { r: value, g: value, b: value },
+    },
+  })
+    .jpeg()
+    .toBuffer();
+
+const reel = {
+  ...photo,
+  media_type: 'VIDEO',
+  media_url: 'https://scontent.cdninstagram.com/reel.mp4',
+  thumbnail_url: photo.media_url,
+};
+
+async function syncReel(t, cover, grabFrame) {
+  const options = await fixture(t);
+  const frames = [];
+  await syncInstagram({
+    ...options,
+    fetchPosts: async () => ({ data: [reel] }),
+    fetchImage: async () =>
+      new Response(cover, { headers: { 'content-type': 'image/jpeg' } }),
+    grabFrame: async (url) => {
+      frames.push(url);
+      return grabFrame();
+    },
+  });
+  const saved = await readFile(
+    join(options.root, 'public/images/instagram/123.jpg'),
+  );
+  return { saved, frames };
+}
+
+test('black reel covers are replaced by a frame from the video', async (t) => {
+  const frame = await solid(160);
+  const { saved, frames } = await syncReel(t, await solid(0), () => frame);
+  assert.deepEqual(frames, [reel.media_url]);
+  assert.ok(saved.equals(frame));
+  assert.equal(await isDark(saved), false);
+});
+
+test('normal reel covers are kept without reading the video', async (t) => {
+  const cover = await solid(160);
+  const { saved, frames } = await syncReel(t, cover, () => {
+    throw new Error('should not grab a frame');
+  });
+  assert.deepEqual(frames, []);
+  assert.ok(saved.equals(cover));
+});
+
+test('the original cover is kept when no video frame is available', async (t) => {
+  const cover = await solid(0);
+  const { saved } = await syncReel(t, cover, () => undefined);
+  assert.ok(saved.equals(cover));
+});
+
+test('a saved cover is used instead of downloading the image', async (t) => {
+  const options = await fixture(t);
+  await mkdir(join(options.root, 'src/content/instagram-covers'));
+  await writeFile(
+    join(options.root, 'src/content/instagram-covers/123.jpg'),
+    'saved-cover',
+  );
+  await syncInstagram({
+    ...options,
+    fetchPosts: async () => ({ data: [reel] }),
+    fetchImage: async () => {
+      throw new Error('should not download');
+    },
+  });
+  assert.equal(
+    await readFile(
+      join(options.root, 'public/images/instagram/123.jpg'),
+      'utf8',
+    ),
+    'saved-cover',
   );
 });
 

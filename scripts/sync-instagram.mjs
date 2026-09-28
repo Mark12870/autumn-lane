@@ -2,8 +2,12 @@ import { mkdir, readFile, writeFile, rename, rm } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { spawnSync } from 'node:child_process';
+import sharp from 'sharp';
 
 const MAX_IMAGE_BYTES = 15 * 1024 * 1024;
+// Average brightness (0–255) below which a reel cover counts as a black frame.
+const DARK_THRESHOLD = 12;
+const FRAME_SECONDS = [1, 2, 4];
 
 export function trustedUrl(value, kind) {
   const url = new URL(value);
@@ -23,6 +27,52 @@ export function trustedUrl(value, kind) {
   return url.href;
 }
 
+function optionalTrustedUrl(value) {
+  try {
+    return trustedUrl(value, 'image');
+  } catch {
+    return undefined;
+  }
+}
+
+export async function isDark(image) {
+  const { channels } = await sharp(image).greyscale().stats();
+  return channels[0].mean < DARK_THRESHOLD;
+}
+
+// Reels whose cover is their black first frame get a frame from later in the
+// video instead. Needs ffmpeg; without it the original cover is kept.
+export async function videoFrame(url) {
+  for (const seconds of FRAME_SECONDS) {
+    const result = spawnSync(
+      'ffmpeg',
+      [
+        '-v',
+        'error',
+        '-ss',
+        String(seconds),
+        '-i',
+        url,
+        '-frames:v',
+        '1',
+        '-f',
+        'image2pipe',
+        '-c:v',
+        'mjpeg',
+        '-q:v',
+        '3',
+        'pipe:1',
+      ],
+      { timeout: 60_000, maxBuffer: MAX_IMAGE_BYTES },
+    );
+    if (result.error?.code === 'ENOENT') return undefined;
+    if (result.status === 0 && result.stdout.length) {
+      if (!(await isDark(result.stdout))) return result.stdout;
+    }
+  }
+  return undefined;
+}
+
 export function normalizePosts(data) {
   if (!Array.isArray(data))
     throw new Error('Instagram response has no post list');
@@ -38,6 +88,10 @@ export function normalizePosts(data) {
       caption: typeof post.caption === 'string' ? post.caption : '',
       permalink: trustedUrl(post.permalink, 'post'),
       source: trustedUrl(media, 'image'),
+      video:
+        post.media_type === 'VIDEO'
+          ? optionalTrustedUrl(post.media_url)
+          : undefined,
     };
   });
 }
@@ -69,6 +123,7 @@ export async function syncInstagram({
   version = 'v25.0',
   fetchPosts,
   fetchImage,
+  grabFrame = videoFrame,
 } = {}) {
   if (!token)
     throw new Error('Set the INSTAGRAM_ACCESS_TOKEN repository secret.');
@@ -95,11 +150,31 @@ export async function syncInstagram({
   const stage = resolve(root, '.instagram-stage');
   const imageDir = resolve(root, 'public/images/instagram');
   const feedFile = resolve(root, 'src/content/instagram.json');
+  // Instagram's API returns a reel's first frame, not the cover chosen in the
+  // app. A cover saved here (<post id>.jpg) is used instead of the download.
+  const coverDir = resolve(root, 'src/content/instagram-covers');
   await rm(stage, { recursive: true, force: true });
   await mkdir(stage, { recursive: true });
   try {
     const output = [];
     for (const post of posts) {
+      const cover = await readFile(resolve(coverDir, `${post.id}.jpg`)).catch(
+        (error) => {
+          if (error.code !== 'ENOENT') throw error;
+        },
+      );
+      if (cover) {
+        const filename = `${post.id}.jpg`;
+        await writeFile(resolve(stage, filename), cover);
+        output.push({
+          id: post.id,
+          type: post.type,
+          caption: post.caption,
+          permalink: post.permalink,
+          image: `/images/instagram/${filename}`,
+        });
+        continue;
+      }
       const response = fetchImage
         ? await fetchImage(post.source)
         : await fetch(post.source, {
@@ -126,8 +201,17 @@ export async function syncInstagram({
         chunks.push(chunk);
       }
       if (!size) throw new Error('Instagram image is empty.');
-      const filename = `${post.id}.${extension}`;
-      await writeFile(resolve(stage, filename), Buffer.concat(chunks));
+      let image = Buffer.concat(chunks);
+      let imageExtension = extension;
+      if (post.video && (await isDark(image))) {
+        const frame = await grabFrame(post.video);
+        if (frame) {
+          image = frame;
+          imageExtension = 'jpg';
+        }
+      }
+      const filename = `${post.id}.${imageExtension}`;
+      await writeFile(resolve(stage, filename), image);
       output.push({
         id: post.id,
         type: post.type,
