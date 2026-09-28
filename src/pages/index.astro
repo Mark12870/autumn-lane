@@ -1,18 +1,34 @@
 ---
 import { Image } from 'astro:assets';
 import band from '../assets/band.jpg';
-import cover from '../assets/eaten-by-mind.png';
+import cover from '../assets/eaten-by-mind.jpg';
 import site from '../content/site.json';
 import feed from '../content/instagram.json';
+import '@fontsource/montserrat/400.css';
+import '@fontsource/montserrat/500.css';
 import '../styles/global.css';
+import Icon from '../components/Icon.astro';
+import instagramIcon from '@phosphor-icons/core/fill/instagram-logo-fill.svg?raw';
+import facebookIcon from '@phosphor-icons/core/fill/facebook-logo-fill.svg?raw';
+import spotifyIcon from '@phosphor-icons/core/fill/spotify-logo-fill.svg?raw';
+import youtubeIcon from '@phosphor-icons/core/fill/youtube-logo-fill.svg?raw';
+import playIcon from '@phosphor-icons/core/fill/play-fill.svg?raw';
+import carouselIcon from '@phosphor-icons/core/fill/copy-fill.svg?raw';
+import caretUpIcon from '@phosphor-icons/core/bold/caret-up-bold.svg?raw';
 
 const asset = (path: string) =>
   `${import.meta.env.BASE_URL.replace(/\/$/, '')}/${path.replace(/^\//, '')}`;
 const canonical = new URL(asset('/'), Astro.site);
+const socialIcons: Record<string, string> = {
+  Instagram: instagramIcon,
+  Facebook: facebookIcon,
+  Spotify: spotifyIcon,
+  YouTube: youtubeIcon,
+};
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="cs">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -23,12 +39,14 @@ const canonical = new URL(asset('/'), Astro.site);
     <link rel="icon" href={asset('favicon-192.png')} sizes="192x192" />
     <link rel="apple-touch-icon" href={asset('apple-touch-icon.png')} />
     <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="cs_CZ" />
     <meta property="og:title" content={site.name} />
     <meta property="og:description" content={site.description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={new URL(cover.src, canonical).href} />
     <meta name="twitter:card" content="summary_large_image" />
-    <title>{site.name} — Alternative rock from Brno</title>
+    <title>{site.name}</title>
     <style
       is:inline
       set:html={`@font-face{font-family:'World of Water';src:url('${asset('fonts/world-of-water.otf')}') format('opentype');font-display:swap;font-weight:400;}`}
@@ -36,7 +54,7 @@ const canonical = new URL(asset('/'), Astro.site);
   </head>
   <body id="top">
     <a class="skip-link" href="#main">
-      Skip to content
+      Přeskočit na obsah
     </a>
     <header class="header">
       <a class="brand" href="#top" aria-label="Autumn Lane home">
@@ -49,7 +67,9 @@ const canonical = new URL(asset('/'), Astro.site);
       </a>
       <nav class="socials" aria-label="Find Autumn Lane">
         {site.socials.map((social) => (
-          <a href={social.url}>{social.label}</a>
+          <a href={social.url} aria-label={social.label}>
+            <Icon svg={socialIcons[social.label]} />
+          </a>
         ))}
       </nav>
     </header>
@@ -67,11 +87,10 @@ const canonical = new URL(asset('/'), Astro.site);
         />
         <div class="hero-inner">
           <div class="release-copy">
-            <p class="eyebrow">Autumn Lane</p>
+            <p class="eyebrow">RELEASED EP</p>
             <h1 id="release-title">{site.release.title}</h1>
             <a class="button" href={site.release.url}>
               {site.release.buttonLabel}
-              <span aria-hidden="true"> ↗</span>
             </a>
           </div>
           <a
@@ -82,10 +101,11 @@ const canonical = new URL(asset('/'), Astro.site);
             <Image
               src={cover}
               alt={`${site.release.title} cover artwork`}
-              widths={[400, 600, 1000]}
-              sizes="(max-width: 700px) 85vw, 500px"
+              widths={[700, 1000, 1500, 2048]}
+              sizes="(max-width: 700px) 170vw, 1000px"
               loading="eager"
-              format="webp"
+              format="avif"
+              quality={80}
             />
           </a>
         </div>
@@ -114,11 +134,10 @@ const canonical = new URL(asset('/'), Astro.site);
                       loading="lazy"
                     />
                     <span class="play" aria-hidden="true">
-                      ▶
+                      <Icon svg={playIcon} />
                     </span>
                   </a>
                 </div>
-                <figcaption>{video.title}</figcaption>
               </figure>
             ))}
           </div>
@@ -145,14 +164,13 @@ const canonical = new URL(asset('/'), Astro.site);
           </div>
         </div>
       </section>
-      <section class="section instagram" aria-labelledby="instagram-title">
-        <div class="container wide">
-          <h2 id="instagram-title">Instagram</h2>
+      <section class="section instagram" aria-label="Instagram">
+        <div class="container">
           <div class="instagram-grid">
             {feed.posts.map((post) => (
               <a
                 href={post.permalink}
-                aria-label={post.caption || 'View post on Instagram'}
+                aria-label={post.caption || 'Instagram post'}
               >
                 <img
                   src={asset(post.image)}
@@ -162,14 +180,18 @@ const canonical = new URL(asset('/'), Astro.site);
                   loading="lazy"
                   decoding="async"
                 />
-                <span class="post-overlay" aria-hidden="true">
-                  View on Instagram ↗
-                </span>
+                {post.type === 'video' && (
+                  <Icon svg={playIcon} class="post-video" />
+                )}
+                {post.type === 'carousel' && (
+                  <Icon svg={carouselIcon} class="post-carousel" />
+                )}
               </a>
             ))}
           </div>
           <a class="button follow" href={site.instagramUrl}>
-            Follow @autumnlaneband ↗
+            <Icon svg={instagramIcon} />
+            Instagram
           </a>
         </div>
       </section>
@@ -178,9 +200,17 @@ const canonical = new URL(asset('/'), Astro.site);
       <p>
         Copyright © {new Date().getFullYear()} {site.name}
       </p>
-      <a href="#top">Back to top ↑</a>
     </footer>
+    <a class="to-top" href="#top" aria-label="Přejít nahoru">
+      <Icon svg={caretUpIcon} />
+    </a>
     <script>
+      const toTop = document.querySelector<HTMLElement>('.to-top');
+      const updateToTop = () =>
+        toTop?.classList.toggle('visible', window.scrollY > 300);
+      addEventListener('scroll', updateToTop, { passive: true });
+      updateToTop();
+
       document
         .querySelectorAll<HTMLAnchorElement>('.video-launch')
         .forEach((link) => {

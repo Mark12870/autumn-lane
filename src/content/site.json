@@ -1,15 +1,24 @@
 {
   "name": "Autumn Lane",
-  "description": "Autumn Lane — alternative rock band from Brno.",
+  "description": "The Alternative Rock band from Brno",
   "release": {
     "title": "Eaten By Mind",
     "url": "https://distrokid.com/hyperfollow/autumnlane1/eaten-by-mind",
     "buttonLabel": "Listen now"
   },
   "videos": [
-    { "title": "Devotion", "youtubeId": "ez0a21Kh1p4" },
-    { "title": "Sara", "youtubeId": "-v9P8IXQ28E" },
-    { "title": "Secret Tension", "youtubeId": "eyvJWimUxd4" }
+    {
+      "title": "Devotion",
+      "youtubeId": "ez0a21Kh1p4"
+    },
+    {
+      "title": "Sara",
+      "youtubeId": "-v9P8IXQ28E"
+    },
+    {
+      "title": "Secret Tension",
+      "youtubeId": "eyvJWimUxd4"
+    }
   ],
   "spotifyArtistId": "0ar40KeazvvzHOeopm25nv",
   "streaming": [
@@ -25,20 +34,32 @@
       "label": "Amazon Music",
       "url": "https://music.amazon.com/artists/B0C3YK4D35/autumn-lane"
     },
-    { "label": "Deezer", "url": "https://www.deezer.com/us/artist/211937277" },
-    { "label": "Tidal", "url": "https://tidal.com/browse/artist/56681349" }
+    {
+      "label": "Deezer",
+      "url": "https://www.deezer.com/us/artist/211937277"
+    },
+    {
+      "label": "Tidal",
+      "url": "https://tidal.com/browse/artist/56681349"
+    }
   ],
   "socials": [
     {
       "label": "Instagram",
       "url": "https://www.instagram.com/autumnlaneband/"
     },
-    { "label": "Facebook", "url": "https://www.facebook.com/autumnlaneband/" },
+    {
+      "label": "Facebook",
+      "url": "https://www.facebook.com/autumnlaneband/"
+    },
     {
       "label": "Spotify",
       "url": "https://open.spotify.com/artist/0ar40KeazvvzHOeopm25nv"
     },
-    { "label": "YouTube", "url": "https://www.youtube.com/@AutumnLaneBand" }
+    {
+      "label": "YouTube",
+      "url": "https://www.youtube.com/@AutumnLaneBand"
+    }
   ],
   "instagramUrl": "https://www.instagram.com/autumnlaneband/"
 }

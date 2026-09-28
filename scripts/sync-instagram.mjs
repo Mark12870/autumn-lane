@@ -32,6 +32,9 @@ export function normalizePosts(data) {
       post.media_type === 'VIDEO' ? post.thumbnail_url : post.media_url;
     return {
       id: post.id,
+      type:
+        { VIDEO: 'video', CAROUSEL_ALBUM: 'carousel' }[post.media_type] ??
+        'image',
       caption: typeof post.caption === 'string' ? post.caption : '',
       permalink: trustedUrl(post.permalink, 'post'),
       source: trustedUrl(media, 'image'),
@@ -127,6 +130,7 @@ export async function syncInstagram({
       await writeFile(resolve(stage, filename), Buffer.concat(chunks));
       output.push({
         id: post.id,
+        type: post.type,
         caption: post.caption,
         permalink: post.permalink,
         image: `/images/instagram/${filename}`,

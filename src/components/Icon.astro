@@ -1,0 +1,12 @@
+---
+// Inlines a Phosphor icon SVG (imported with ?raw) as a decorative icon.
+interface Props {
+  svg: string;
+  class?: string;
+}
+
+const { svg, class: className } = Astro.props;
+const attributes = `aria-hidden="true" focusable="false"${className ? ` class="${className}"` : ''}`;
+---
+
+<Fragment set:html={svg.replace('<svg ', `<svg ${attributes} `)} />

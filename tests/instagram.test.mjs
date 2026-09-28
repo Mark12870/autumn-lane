@@ -36,6 +36,15 @@ test('videos use their thumbnail and captions may be absent', () => {
   ]);
   assert.equal(post.source, photo.media_url);
   assert.equal(post.caption, '');
+  assert.equal(post.type, 'video');
+});
+
+test('post types are normalized for grid icons', () => {
+  const types = normalizePosts([
+    photo,
+    { ...photo, media_type: 'CAROUSEL_ALBUM' },
+  ]).map((post) => post.type);
+  assert.deepEqual(types, ['image', 'carousel']);
 });
 
 test('untrusted media, unsafe IDs and invalid response structures are rejected', () => {
