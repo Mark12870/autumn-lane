@@ -1,3 +1,2 @@
 # Autumn Lane
-
-Source code for www.autumnlane.cz
+Source code for www.autumnlane.cz 
