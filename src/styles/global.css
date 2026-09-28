@@ -268,9 +268,7 @@ figure {
     #161d26;
 }
 .streaming {
-  background:
-    radial-gradient(ellipse 60% 70% at 50% -10%, #b2222226, transparent 70%),
-    #000;
+  background: #000;
 }
 .spotify {
   border-radius: 12px;
